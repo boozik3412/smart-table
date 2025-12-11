@@ -74,7 +74,7 @@ async function render(action) {
 
   query = applySearching(query, state, action); // ✅ ЗАКОММЕНТИРОВАНО (Шаг 4)
   query = applyFiltering(query, state, action);   // ✅ РАСКОММЕНТИРОВАНО (Шаг 3)
-  // query = applySorting(query, state, action);  // ❌ ЗАКОММЕНТИРОВАНО (Шаг 5)
+  query = applySorting(query, state, action);  // ❌ ЗАКОММЕНТИРОВАНО (Шаг 5)
   
   query = applyPagination(query, state, action);
 
