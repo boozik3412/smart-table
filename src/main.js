@@ -32,26 +32,6 @@ function collectState() {
   };
 }
 
-/**
- * Перерисовка состояния таблицы при любых изменениях
- * @param {HTMLButtonElement?} action
- */
-async function render(action) {
-  let state = collectState(); // состояние полей из таблицы
-  let query = {}; // здесь будут формироваться параметры запроса
-
-  // Закомментированные apply* будут раскомментированы в следующих шагах:
-  // query = applySearching(query, state, action);
-  // query = applyFiltering(query, state, action);
-  // query = applySorting(query, state, action);
-  
-  query = applyPagination(query, state, action); // ✅ Применяем пагинацию ПЕРЕД запросом
-
-  const { total, items } = await API.getRecords(query);
-  updatePagination(total, query); // ✅ Обновляем пагинатор ПОСЛЕ запроса
-  sampleTable.render(items);
-}
-
 const sampleTable = initTable(
   {
     tableTemplate: "table",
@@ -62,7 +42,7 @@ const sampleTable = initTable(
   render
 );
 
-// @todo: инициализация компонент
+// Инициализируем все компоненты ДО определения функции render()
 const { applyPagination, updatePagination } = initPagination(
   sampleTable.pagination.elements,
   (el, page, isCurrent) => {
@@ -80,16 +60,33 @@ const applySorting = initSorting([
   sampleTable.header.elements.sortByTotal,
 ]);
 
-// const applyFiltering = initFiltering(sampleTable.filter.elements, {
-// searchBySeller: indexes.sellers
-// });
+const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements);
 
 const applySearching = initSearching("search");
+
+/**
+ * Перерисовка состояния таблицы при любых изменениях
+ * @param {HTMLButtonElement?} action
+ */
+async function render(action) {
+  let state = collectState(); // состояние полей из таблицы
+  let query = {}; // здесь будут формироваться параметры запроса
+
+  query = applySearching(query, state, action);
+  query = applyFiltering(query, state, action);
+  // query = applySorting(query, state, action);
+  
+  query = applyPagination(query, state, action);
+
+  const { total, items } = await API.getRecords(query);
+  updatePagination(total, query);
+  sampleTable.render(items);
+}
 
 // Асинхронная инициализация
 async function init() {
   const indexes = await API.getIndexes();
-  // Здесь позже добавим updateIndexes для фильтра
+  updateIndexes(sampleTable.filter.elements, { searchBySeller: indexes.sellers });
 }
 
 const appRoot = document.querySelector("#app");
