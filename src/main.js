@@ -72,9 +72,9 @@ async function render(action) {
   let state = collectState(); // состояние полей из таблицы
   let query = {}; // здесь будут формироваться параметры запроса
 
-  query = applySearching(query, state, action);
-  query = applyFiltering(query, state, action);
-  // query = applySorting(query, state, action);
+  query = applySearching(query, state, action); // ✅ ЗАКОММЕНТИРОВАНО (Шаг 4)
+  query = applyFiltering(query, state, action);   // ✅ РАСКОММЕНТИРОВАНО (Шаг 3)
+  // query = applySorting(query, state, action);  // ❌ ЗАКОММЕНТИРОВАНО (Шаг 5)
   
   query = applyPagination(query, state, action);
 
